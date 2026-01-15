@@ -12,10 +12,35 @@ const OUTER_R = 390;
 
 // Daily target list (same idea as targets.txt)
 const TARGETS = [
-  "gravity","nostalgia","volcano","cathedral","democracy","jazz","pirate","oxygen",
-  "recipe","mirror","anxiety","friendship","thunder","library","orchard","storm",
-  "winter","museum","galaxy","whisper"
+  // physical / natural
+  "gravity","thunder","storm","volcano","ember","tide","horizon","glacier",
+  "orbit","eclipse","echo","signal","shadow","mist","fracture","pulse",
+
+  // places / structures
+  "cathedral","library","orchard","museum","harbor","ruin","corridor",
+  "workshop","observatory","sanctuary","crossroads",
+
+  // emotions / inner states
+  "nostalgia","anxiety","hope","wonder","isolation","longing","trust",
+  "curiosity","melancholy","anticipation","relief","dread","belonging",
+
+  // abstract concepts
+  "memory","identity","silence","freedom","balance","chaos","truth",
+  "absence","connection","pattern","order","entropy","meaning",
+
+  // human / social
+  "friendship","ritual","tradition","promise","conflict","choice",
+  "forgiveness","loss","growth","resolve","failure","success",
+
+  // creative / intellectual
+  "music","rhythm","language","story","symbol","metaphor","design",
+  "improvisation","craft","invention","theory",
+
+  // science / tech flavored
+  "signal","frequency","network","feedback","system","threshold",
+  "model","variable","constraint","simulation"
 ];
+
 
 // --------------------
 // DOM
