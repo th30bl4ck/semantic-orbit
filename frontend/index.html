@@ -1,0 +1,331 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Semantic Orbit</title>
+  <style>
+    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; background:#0b0c10; color:#e8e8e8; }
+    .wrap { max-width: 900px; margin: 0 auto; padding: 16px; }
+    .top { display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+    .card { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.10); border-radius: 16px; padding: 12px; }
+    canvas { width:100%; height:auto; border-radius: 18px; border: 1px solid rgba(255,255,255,0.10); background: radial-gradient(circle at center, rgba(150,150,255,0.10), rgba(0,0,0,0) 55%); }
+    input { width: 100%; padding: 12px 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.20); background: rgba(0,0,0,0.3); color: #fff; font-size: 16px; }
+    .row { display:flex; gap:12px; align-items:center; }
+    .hint { opacity:0.8; font-size: 13px; line-height:1.4; }
+    .pill { opacity:0.8; font-size:12px; padding:6px 10px; border-radius:999px; border:1px solid rgba(255,255,255,0.15); }
+    .log { max-height: 180px; overflow:auto; }
+    .log div { padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 14px; }
+    .solved { font-weight:700; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div>
+        <div style="font-size:22px;font-weight:800;">Semantic Orbit</div>
+        <div class="hint">Navigate meaning. Watch gravity. Find the core.</div>
+      </div>
+      <div class="pill" id="puzzleId">loading…</div>
+    </div>
+
+    <div class="card" style="margin-top:12px;">
+      <canvas id="c" width="900" height="600"></canvas>
+    </div>
+
+    <div class="card" style="margin-top:12px;">
+      <div class="row">
+        <input id="guess" placeholder="Type a word and press Enter…" autocomplete="off" />
+      </div>
+      <div class="hint" style="margin-top:8px;">
+        Motion meanings: pulled inward = closer • sideways drift = related • pushed outward = far • tight orbit = very close
+      </div>
+    </div>
+
+    <div class="card log" style="margin-top:12px;">
+      <div style="opacity:0.8; font-size:12px; margin-bottom:6px;">Orbit Log</div>
+      <div id="log"></div>
+    </div>
+  </div>
+
+<script>
+const API = "http://127.0.0.1:8000";
+const canvas = document.getElementById("c");
+const ctx = canvas.getContext("2d");
+const input = document.getElementById("guess");
+const logEl = document.getElementById("log");
+const puzzleEl = document.getElementById("puzzleId");
+
+const WORLD = { w: 900, h: 600 };
+const CENTER = { x: WORLD.w/2, y: WORLD.h/2 };
+const CORE_R = 60;
+const OUTER_R = 390;
+
+let solved = false;
+
+let collapseT = 0; // 0..1, progresses when solved
+
+// --------------------
+// Persistence (localStorage)
+// --------------------
+let PUZZLE_ID = null;
+
+function storageKey() {
+  return PUZZLE_ID ? `semantic-orbit:${PUZZLE_ID}` : `semantic-orbit:unknown`;
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(storageKey());
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+function saveState(state) {
+  try {
+    localStorage.setItem(storageKey(), JSON.stringify(state));
+  } catch {}
+}
+
+function clearState() {
+  try {
+    localStorage.removeItem(storageKey());
+  } catch {}
+}
+
+function currentState() {
+  return {
+    guesses: nodes.map(n => n.word),
+    motions: nodes.map(n => n.motion),
+    solved
+  };
+}
+
+
+const nodes = []; // {word, x, y, tx, ty, vx, vy, motion, win, born}
+
+function worldToScreen(wx, wy) {
+  return { x: CENTER.x + wx, y: CENTER.y + wy };
+}
+
+function addLog(text, cls="") {
+  const d = document.createElement("div");
+  d.textContent = text;
+  if (cls) d.className = cls;
+  logEl.prepend(d);
+}
+
+function drawRings() {
+  ctx.save();
+  ctx.translate(CENTER.x, CENTER.y);
+
+  // rings
+  for (let r of [CORE_R, 140, 220, 300, OUTER_R]) {
+    ctx.beginPath();
+    ctx.arc(0,0,r,0,Math.PI*2);
+    ctx.strokeStyle = "rgba(255,255,255,0.08)";
+    ctx.lineWidth = (r === CORE_R) ? 2 : 1;
+    ctx.stroke();
+  }
+
+  // crosshair
+  ctx.beginPath();
+  ctx.moveTo(-OUTER_R, 0);
+  ctx.lineTo(OUTER_R, 0);
+  ctx.moveTo(0, -OUTER_R);
+  ctx.lineTo(0, OUTER_R);
+  ctx.strokeStyle = "rgba(255,255,255,0.04)";
+  ctx.stroke();
+
+  // core glow
+  const extra = solved ? (18 * collapseT) : 0;
+  ctx.beginPath();
+  ctx.arc(0,0, (CORE_R-6) + extra, 0, Math.PI*2);
+  ctx.fillStyle = solved ? "rgba(210,210,255,0.18)" : "rgba(170,170,255,0.10)";
+  ctx.fill();
+
+
+  ctx.restore();
+}
+
+function motionParams(motion) {
+  // tweak these to get your signature feel
+  switch(motion) {
+    case "tight":  return { spring: 0.12, damp: 0.85, jitter: 0.20 };
+    case "pulled": return { spring: 0.10, damp: 0.86, jitter: 0.35 };
+    case "drift":  return { spring: 0.07, damp: 0.88, jitter: 0.50 };
+    case "wobble": return { spring: 0.05, damp: 0.90, jitter: 0.70 };
+    case "pushed": return { spring: 0.04, damp: 0.92, jitter: 0.90 };
+    default:       return { spring: 0.06, damp: 0.88, jitter: 0.60 };
+  }
+}
+
+function update(dt) {
+    if (solved && collapseT < 1) {
+    collapseT = Math.min(1, collapseT + 0.02 * dt);
+  }  
+    for (const n of nodes) {
+    const {spring, damp, jitter} = motionParams(n.motion);
+
+    // spring toward target
+    const ax = (n.tx - n.x) * spring;
+    const ay = (n.ty - n.y) * spring;
+
+    // semantic "drift": sideways wobble that makes it feel alive
+    const t = (performance.now() - n.born) * 0.001;
+    const jx = Math.sin(t*2.1 + n.seed) * jitter;
+    const jy = Math.cos(t*1.7 + n.seed*0.7) * jitter;
+
+    n.vx = (n.vx + ax + jx) * damp;
+    n.vy = (n.vy + ay + jy) * damp;
+
+    n.x += n.vx * dt;
+    n.y += n.vy * dt;
+      // Core collapse: gently pull everything inward after solving
+    if (solved) {
+      n.tx *= (1 - 0.02 * collapseT);
+      n.ty *= (1 - 0.02 * collapseT);
+    }
+
+}
+}
+
+function draw() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  drawRings();
+
+  // draw nodes
+  for (const n of nodes) {
+    const s = worldToScreen(n.x, n.y);
+    const age = Math.min(1, (performance.now() - n.born)/600);
+
+    // simple glow
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, 10 + 6*(1-age), 0, Math.PI*2);
+    ctx.fillStyle = "rgba(200,200,255,0.10)";
+    ctx.fill();
+
+    // dot
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, 5, 0, Math.PI*2);
+    ctx.fillStyle = n.win ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.75)";
+    ctx.fill();
+
+    // label
+    ctx.font = "13px system-ui";
+    ctx.fillStyle = "rgba(255,255,255,0.85)";
+    ctx.fillText(n.word, s.x + 10, s.y - 10);
+  }
+
+  if (solved) {
+    ctx.save();
+    ctx.fillStyle = "rgba(255,255,255,0.92)";
+    ctx.font = "bold 28px system-ui";
+    ctx.fillText("CORE FOUND", 18, 44);
+    ctx.font = "14px system-ui";
+    ctx.fillStyle = "rgba(255,255,255,0.75)";
+    ctx.fillText("Come back tomorrow for a new orbit.", 18, 68);
+    ctx.restore();
+  }
+}
+
+let last = performance.now();
+function loop() {
+  const now = performance.now();
+  const dt = Math.min(2.0, (now - last) / 16.67);
+  last = now;
+  update(dt);
+  draw();
+  requestAnimationFrame(loop);
+}
+loop();
+
+async function fetchPuzzleId() {
+  const r = await fetch(`${API}/api/daily`);
+  const j = await r.json();
+
+  PUZZLE_ID = j.puzzle_id;
+  puzzleEl.textContent = j.puzzle_id;
+
+  // Restore prior session for this puzzle
+  const saved = loadState();
+  if (saved && Array.isArray(saved.guesses) && saved.guesses.length) {
+    addLog(`Restored ${saved.guesses.length} guess(es).`, "");
+    // Re-play guesses to rebuild the orbit positions consistently
+    for (const w of saved.guesses) {
+      // eslint-disable-next-line no-await-in-loop
+      const res = await submitGuess(w);
+      spawnNodeFromResult(res.node, true); // restore mode
+      if (res.solved) solved = true;
+    }
+    if (saved.solved) solved = true;
+  }
+
+  if (solved) {
+    addLog("You already found today’s core.", "solved");
+  }
+}
+fetchPuzzleId();
+
+
+async function submitGuess(word) {
+  const r = await fetch(`${API}/api/guess`, {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({guess: word})
+  });
+  const j = await r.json();
+  return j;
+}
+
+function spawnNodeFromResult(node, restoring = false) {
+  // When restoring, spawn closer so it doesn't fly in dramatically
+  const spawnAngle = Math.random() * Math.PI * 2;
+  const spawnR = restoring ? (OUTER_R + 10) : (OUTER_R + 40);
+
+  const sx = spawnR * Math.cos(spawnAngle);
+  const sy = spawnR * Math.sin(spawnAngle);
+
+  nodes.push({
+    word: node.word,
+    x: sx, y: sy,
+    tx: node.x, ty: node.y,
+    vx: 0, vy: 0,
+    motion: node.motion,
+    win: node.win,
+    born: performance.now(),
+    seed: Math.random() * 10
+  });
+}
+
+
+input.addEventListener("keydown", async (e) => {
+  if (e.key !== "Enter") return;
+  if (solved) return;
+
+  const word = input.value.trim().toLowerCase();
+  if (!word) return;
+  input.value = "";
+
+  const res = await submitGuess(word);
+  const node = res.node;
+
+  spawnNodeFromResult(node, false);
+
+  addLog(`${node.word} → ${node.motion}${node.win ? " (core!)" : ""}`, node.win ? "solved" : "");
+
+  if (res.solved) {
+    solved = true;
+    addLog("You entered the core.", "solved");
+  }
+
+  saveState(currentState());
+});
+
+</script>
+</body>
+</html>
