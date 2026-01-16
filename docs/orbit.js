@@ -91,6 +91,7 @@ const input = document.getElementById("guess");
 const logEl = document.getElementById("log");
 const puzzleEl = document.getElementById("puzzleId");
 const guessCountEl = document.getElementById("guessCount");
+const resetGuessesBtn = document.getElementById("resetGuesses");
 
 const WORLD = { w: canvas.width, h: canvas.height };
 const CENTER = { x: WORLD.w / 2, y: WORLD.h / 2 };
@@ -199,6 +200,16 @@ function saveProgress() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
 }
 
+function resetGuesses() {
+  nodes.length = 0;
+  progress.guesses = [];
+  solved = false;
+  collapseT = 0;
+  logEl.innerHTML = "";
+  saveProgress();
+  updateGuessCount();
+  addLog("Guesses cleared.", "");
+}
 
 // simple angle from embedding chunks (cheap projection)
 function embeddingToAngle(vec) {
@@ -423,6 +434,11 @@ if (progress.guesses.includes(word)) {
 
   await applyGuess(word, false);
 
+});
+
+resetGuessesBtn.addEventListener("click", () => {
+  if (!embedder) return;
+  resetGuesses();
 });
 
 init();
