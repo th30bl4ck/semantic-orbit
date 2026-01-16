@@ -65,6 +65,9 @@ const nodes = []; // {word, x,y, tx,ty, vx,vy, motion, win, born, seed}
 let embedder = null;
 let targetWord = null;
 let targetVec = null;
+let progress = { puzzleId: null, guesses: [] };
+
+const STORAGE_KEY = "semantic-orbit-progress";
 
 // --------------------
 // Helpers
@@ -128,6 +131,29 @@ function pickDailyTarget() {
   puzzleEl.textContent = PUZZLE_ID;
   targetWord = TARGETS[idx];
 }
+
+function loadProgress() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return { puzzleId: PUZZLE_ID, guesses: [] };
+    const data = JSON.parse(raw);
+    if (!data || data.puzzleId !== PUZZLE_ID || !Array.isArray(data.guesses)) {
+      return { puzzleId: PUZZLE_ID, guesses: [] };
+    }
+    return { puzzleId: data.puzzleId, guesses: [...data.guesses] };
+  } catch (err) {
+    return { puzzleId: PUZZLE_ID, guesses: [] };
+  }
+}
+
+function saveProgress() {
+  const payload = {
+    puzzleId: progress.puzzleId,
+    guesses: progress.guesses,
+  };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+}
+
 
 // simple angle from embedding chunks (cheap projection)
 function embeddingToAngle(vec) {
@@ -289,18 +315,18 @@ async function init() {
   embedder = await pipeline("feature-extraction", MODEL_ID);
   pickDailyTarget();
   targetVec = await embed(targetWord);
+  progress = loadProgress();
+  if (progress.guesses.length > 0) {
+    addLog(`Restoring ${progress.guesses.length} guess${progress.guesses.length === 1 ? "" : "es"}...`, "");
+    for (const word of progress.guesses) {
+      await applyGuess(word, true);
+    }
+  }
   addLog("Ready.", "");
 }
 
-input.addEventListener("keydown", async (e) => {
-  if (e.key !== "Enter") return;
-  if (!embedder) return;
-  if (solved) return;
 
-  const word = input.value.trim().toLowerCase();
-  if (!word) return;
-  input.value = "";
-
+async function applyGuess(word, restoring = false) {
   const v = await embed(word);
   const sim = dot(v, targetVec); // already normalized
   const r = similarityToRadius(sim);
@@ -312,13 +338,31 @@ input.addEventListener("keydown", async (e) => {
   const win = sim >= WIN_SIM || r <= CORE_R + 4;
   const motion = motionKind(sim);
 
-  spawnNode(word, x, y, motion, win, false);
+  spawnNode(word, x, y, motion, win, restoring);
   addLog(`${word} → ${motion}${win ? " (core!)" : ""}`, win ? "solved" : "");
 
   if (win) {
     solved = true;
     addLog("You entered the core.", "solved");
   }
+
+  if (!restoring) {
+    progress.guesses.push(word);
+    saveProgress();
+  }
+}
+
+input.addEventListener("keydown", async (e) => {
+  if (e.key !== "Enter") return;
+  if (!embedder) return;
+  if (solved) return;
+
+  const word = input.value.trim().toLowerCase();
+  if (!word) return;
+  input.value = "";
+
+  await applyGuess(word, false);
+
 });
 
 init();
