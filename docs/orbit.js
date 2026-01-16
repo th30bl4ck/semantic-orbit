@@ -61,7 +61,7 @@ let solved = false;
 let collapseT = 0;
 let PUZZLE_ID = null;
 
-const nodes = []; // {word, x,y, tx,ty, vx,vy, motion, win, born, seed}
+const nodes = []; // {word, x,y, tx,ty, vx,vy, motion, win, born, seed, baseAngle, radius, orbitSpeed}
 let embedder = null;
 let targetWord = null;
 let targetVec = null;
@@ -172,6 +172,9 @@ function spawnNode(word, targetX, targetY, motion, win, restoring=false) {
 
   const sx = spawnR * Math.cos(spawnAngle);
   const sy = spawnR * Math.sin(spawnAngle);
+  const baseAngle = Math.atan2(targetY, targetX);
+  const radius = Math.hypot(targetX, targetY);
+  const orbitSpeed = (Math.random() < 0.5 ? -1 : 1) * motionParams(motion).orbitSpeed;
 
   nodes.push({
     word,
@@ -181,18 +184,21 @@ function spawnNode(word, targetX, targetY, motion, win, restoring=false) {
     motion,
     win,
     born: performance.now(),
-    seed: Math.random() * 10
+    seed: Math.random() * 10,
+    baseAngle,
+    radius,
+    orbitSpeed
   });
 }
 
 function motionParams(motion) {
   switch(motion) {
-    case "tight":  return { spring: 0.12, damp: 0.85, jitter: 0.20 };
-    case "pulled": return { spring: 0.10, damp: 0.86, jitter: 0.35 };
-    case "drift":  return { spring: 0.07, damp: 0.88, jitter: 0.50 };
-    case "wobble": return { spring: 0.05, damp: 0.90, jitter: 0.70 };
-    case "pushed": return { spring: 0.04, damp: 0.92, jitter: 0.90 };
-    default:       return { spring: 0.06, damp: 0.88, jitter: 0.60 };
+    case "tight":  return { spring: 0.12, damp: 0.85, jitter: 0.06, orbitSpeed: 0.10 };
+    case "pulled": return { spring: 0.10, damp: 0.86, jitter: 0.08, orbitSpeed: 0.08 };
+    case "drift":  return { spring: 0.07, damp: 0.88, jitter: 0.10, orbitSpeed: 0.06 };
+    case "wobble": return { spring: 0.05, damp: 0.90, jitter: 0.12, orbitSpeed: 0.05 };
+    case "pushed": return { spring: 0.04, damp: 0.92, jitter: 0.14, orbitSpeed: 0.04 };
+    default:       return { spring: 0.06, damp: 0.88, jitter: 0.10, orbitSpeed: 0.06 };
   }
 }
 
@@ -233,11 +239,14 @@ function update(dt) {
   if (solved && collapseT < 1) collapseT = Math.min(1, collapseT + 0.02 * dt);
 
   for (const n of nodes) {
+      const t = (performance.now() - n.born) * 0.001;
+    const orbitAngle = n.baseAngle + n.orbitSpeed * t;
+    n.tx = n.radius * Math.cos(orbitAngle);
+    n.ty = n.radius * Math.sin(orbitAngle);  
     const {spring, damp, jitter} = motionParams(n.motion);
     const ax = (n.tx - n.x) * spring;
     const ay = (n.ty - n.y) * spring;
 
-    const t = (performance.now() - n.born) * 0.001;
     const jx = Math.sin(t*2.1 + n.seed) * jitter;
     const jy = Math.cos(t*1.7 + n.seed*0.7) * jitter;
 
@@ -248,8 +257,7 @@ function update(dt) {
     n.y += n.vy * dt;
 
     if (solved) {
-      n.tx *= (1 - 0.02 * collapseT);
-      n.ty *= (1 - 0.02 * collapseT);
+       n.radius *= (1 - 0.02 * collapseT);
     }
   }
 }
