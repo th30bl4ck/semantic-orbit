@@ -118,13 +118,13 @@ def embedding_to_angle(vec: np.ndarray, proj2d: np.ndarray) -> float:
 
 
 def orbit_motion_kind(sim: float) -> str:
-    if sim >= 0.69:
+    if sim >= 0.38:
         return "tight"
-    if sim >= 0.55:
+    if sim >= 0.30:
         return "pulled"
-    if sim >= 0.40:
-        return "drift"
     if sim >= 0.20:
+        return "drift"
+    if sim >= 0.10:
         return "wobble"
     return "pushed"
 
