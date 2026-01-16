@@ -221,15 +221,13 @@ def submit_guess(payload: GuessIn):
     x = r * math.cos(ang)
     y = r * math.sin(ang)
 
-    win = sim >= WIN_SIMILARITY or r <= CORE_RADIUS + 4
+    WIN_RADIUS = 90  # or 100
+    win = sim >= WIN_SIMILARITY or r <= WIN_RADIUS
+
+
     motion = orbit_motion_kind(sim)
 
     node = NodeOut(word=word, x=float(x), y=float(y), motion=motion, win=win)
     return GuessOut(node=node, solved=win)
 
 
-# Optional: reveal endpoint for debugging (DON'T SHIP)
-@app.get("/api/_debug_target")
-def debug_target():
-    st = get_state()
-    return {"target": st.target, "seed": st.seed}
