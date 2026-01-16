@@ -10,35 +10,75 @@ const MIN_SIM = 0.05;
 const CORE_R = 60;
 const OUTER_R = 390;
 
-// Daily target list (same idea as targets.txt)
+// Daily target list 
 const TARGETS = [
   // physical / natural
-  "gravity","thunder","storm","volcano","ember","tide","horizon","glacier",
-  "orbit","eclipse","echo","signal","shadow","mist","fracture","pulse",
+"meteor","comet","asteroid","nebula","cosmos","vacuum","plasma","quasar",
+"monsoon","avalanche","earthquake","aftershock","fissure","rift","canyon",
+"delta","estuary","lagoon","reef","abyss","trench","geyser","thermal",
+"frost","hail","dew","drought","blight","canopy","understory","root",
+"ember","ash","smoke","soot","flare","spark","wildfire","char",
+
 
   // places / structures
-  "cathedral","library","orchard","museum","harbor","ruin","corridor",
-  "workshop","observatory","sanctuary","crossroads",
+  "bastion","citadel","fortress","outpost","encampment","tower","spire",
+"basement","attic","cellar","vault","archive","repository","chamber",
+"gallery","hallway","alcove","atrium","courtyard","plaza","market",
+"border","frontier","checkpoint","terminal","platform","station",
+"monument","shrine","crypt","mausoleum","graveyard","lighthouse",
 
   // emotions / inner states
-  "nostalgia","anxiety","hope","wonder","isolation","longing","trust",
-  "curiosity","melancholy","anticipation","relief","dread","belonging",
+ "yearning","regret","envy","guilt","shame","pride","relief","panic",
+"contentment","serenity","unease","restlessness","apathy","resentment",
+"affection","devotion","adoration","tenderness","bitterness","jealousy",
+"despair","emptiness","fulfillment","loneliness","belonging","alienation",
+"gratitude","compassion","empathy","detachment","vulnerability",
 
   // abstract concepts
-  "memory","identity","silence","freedom","balance","chaos","truth",
-  "absence","connection","pattern","order","entropy","meaning",
+  "duality","paradox","infinity","finitude","continuity","discontinuity",
+"causality","randomness","probability","certainty","ambiguity","clarity",
+"origin","destination","transition","boundary","threshold","liminality",
+"symmetry","asymmetry","equilibrium","instability","emergence","collapse",
+"truth","illusion","appearance","essence","potential","actuality",
 
   // human / social
-  "friendship","ritual","tradition","promise","conflict","choice",
-  "forgiveness","loss","growth","resolve","failure","success",
+ "alliance","betrayal","loyalty","authority","rebellion","obedience",
+"tradition","heritage","custom","taboo","identity","reputation",
+"status","hierarchy","community","isolation","solidarity","division",
+"cooperation","competition","negotiation","compromise","sacrifice",
+"legacy","inheritance","mentorship","leadership","followership",
 
   // creative / intellectual
-  "music","rhythm","language","story","symbol","metaphor","design",
-  "improvisation","craft","invention","theory",
+ "composition","structure","form","contrast","tone","texture","palette",
+"motif","theme","variation","iteration","draft","revision","edit",
+"critique","interpretation","expression","abstraction","minimalism",
+"maximalism","innovation","tradition","influence","canon","experiment",
+"play","practice","discipline","mastery","craftsmanship",
 
   // science / tech flavored
-  "signal","frequency","network","feedback","system","threshold",
-  "model","variable","constraint","simulation"
+ "algorithm","protocol","architecture","interface","latency","bandwidth",
+"signal","noise","entropy","compression","resolution","precision",
+"approximation","iteration","optimization","convergence","divergence",
+"variable","parameter","constraint","dataset","distribution","outlier",
+"feedback","control","automation","simulation","modeling","prediction",
+
+// Time / Process
+"moment","instant","duration","interval","sequence","cycle","loop",
+"phase","epoch","era","aftermath","prelude","echo","aftermath",
+"beginning","ending","delay","pause","acceleration","decay",
+"growth","erosion","drift","accumulation","release",
+
+// Sensory / Atmospheric
+"silence","whisper","hum","static","reverberation","glow","flicker",
+"shadow","glare","blur","haze","fog","scent","fragrance","stench",
+"warmth","chill","pressure","weight","lightness","roughness","smoothness",
+
+// Weird
+"ghost","trace","scar","imprint","residue","fragment","shard","relic",
+"signal","echo","mirror","reflection","veil","mask","pulse","rift",
+"thread","knot","tangle","web","loop","spiral","axis","center","edge",
+
+
 ];
 
 
