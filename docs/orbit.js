@@ -10,77 +10,73 @@ const MIN_SIM = 0.05;
 const CORE_R = 60;
 const OUTER_R = 390;
 
-// Daily target list 
+// Daily target list
 const TARGETS = [
   // physical / natural
-"meteor","comet","asteroid","nebula","cosmos","vacuum","plasma","quasar",
-"monsoon","avalanche","earthquake","aftershock","fissure","rift","canyon",
-"delta","estuary","lagoon","reef","abyss","trench","geyser","thermal",
-"frost","hail","dew","drought","blight","canopy","understory","root",
-"ember","ash","smoke","soot","flare","spark","wildfire","char",
-
+  "meteor","comet","asteroid","nebula","cosmos","vacuum","plasma","quasar",
+  "monsoon","avalanche","earthquake","aftershock","fissure","rift","canyon",
+  "delta","estuary","lagoon","reef","abyss","trench","geyser","thermal",
+  "frost","hail","dew","drought","blight","canopy","understory","root",
+  "ember","ash","smoke","soot","flare","spark","wildfire","char",
 
   // places / structures
   "bastion","citadel","fortress","outpost","encampment","tower","spire",
-"basement","attic","cellar","vault","archive","repository","chamber",
-"gallery","hallway","alcove","atrium","courtyard","plaza","market",
-"border","frontier","checkpoint","terminal","platform","station",
-"monument","shrine","crypt","mausoleum","graveyard","lighthouse",
+  "basement","attic","cellar","vault","archive","repository","chamber",
+  "gallery","hallway","alcove","atrium","courtyard","plaza","market",
+  "border","frontier","checkpoint","terminal","platform","station",
+  "monument","shrine","crypt","mausoleum","graveyard","lighthouse",
 
   // emotions / inner states
- "yearning","regret","envy","guilt","shame","pride","relief","panic",
-"contentment","serenity","unease","restlessness","apathy","resentment",
-"affection","devotion","adoration","tenderness","bitterness","jealousy",
-"despair","emptiness","fulfillment","loneliness","belonging","alienation",
-"gratitude","compassion","empathy","detachment","vulnerability",
+  "yearning","regret","envy","guilt","shame","pride","relief","panic",
+  "contentment","serenity","unease","restlessness","apathy","resentment",
+  "affection","devotion","adoration","tenderness","bitterness","jealousy",
+  "despair","emptiness","fulfillment","loneliness","belonging","alienation",
+  "gratitude","compassion","empathy","detachment","vulnerability",
 
   // abstract concepts
   "duality","paradox","infinity","finitude","continuity","discontinuity",
-"causality","randomness","probability","certainty","ambiguity","clarity",
-"origin","destination","transition","boundary","threshold","liminality",
-"symmetry","asymmetry","equilibrium","instability","emergence","collapse",
-"truth","illusion","appearance","essence","potential","actuality",
+  "causality","randomness","probability","certainty","ambiguity","clarity",
+  "origin","destination","transition","boundary","threshold","liminality",
+  "symmetry","asymmetry","equilibrium","instability","emergence","collapse",
+  "truth","illusion","appearance","essence","potential","actuality",
 
   // human / social
- "alliance","betrayal","loyalty","authority","rebellion","obedience",
-"tradition","heritage","custom","taboo","identity","reputation",
-"status","hierarchy","community","isolation","solidarity","division",
-"cooperation","competition","negotiation","compromise","sacrifice",
-"legacy","inheritance","mentorship","leadership","followership",
+  "alliance","betrayal","loyalty","authority","rebellion","obedience",
+  "tradition","heritage","custom","taboo","identity","reputation",
+  "status","hierarchy","community","isolation","solidarity","division",
+  "cooperation","competition","negotiation","compromise","sacrifice",
+  "legacy","inheritance","mentorship","leadership","followership",
 
   // creative / intellectual
- "composition","structure","form","contrast","tone","texture","palette",
-"motif","theme","variation","iteration","draft","revision","edit",
-"critique","interpretation","expression","abstraction","minimalism",
-"maximalism","innovation","tradition","influence","canon","experiment",
-"play","practice","discipline","mastery","craftsmanship",
+  "composition","structure","form","contrast","tone","texture","palette",
+  "motif","theme","variation","iteration","draft","revision","edit",
+  "critique","interpretation","expression","abstraction","minimalism",
+  "maximalism","innovation","tradition","influence","canon","experiment",
+  "play","practice","discipline","mastery","craftsmanship",
 
   // science / tech flavored
- "algorithm","protocol","architecture","interface","latency","bandwidth",
-"signal","noise","entropy","compression","resolution","precision",
-"approximation","iteration","optimization","convergence","divergence",
-"variable","parameter","constraint","dataset","distribution","outlier",
-"feedback","control","automation","simulation","modeling","prediction",
+  "algorithm","protocol","architecture","interface","latency","bandwidth",
+  "signal","noise","entropy","compression","resolution","precision",
+  "approximation","iteration","optimization","convergence","divergence",
+  "variable","parameter","constraint","dataset","distribution","outlier",
+  "feedback","control","automation","simulation","modeling","prediction",
 
-// Time / Process
-"moment","instant","duration","interval","sequence","cycle","loop",
-"phase","epoch","era","aftermath","prelude","aftermath",
-"beginning","ending","delay","pause","acceleration","decay",
-"growth","erosion","drift","accumulation","release",
+  // Time / Process
+  "moment","instant","duration","interval","sequence","cycle","loop",
+  "phase","epoch","era","aftermath","prelude","aftermath",
+  "beginning","ending","delay","pause","acceleration","decay",
+  "growth","erosion","drift","accumulation","release",
 
-// Sensory / Atmospheric
-"silence","whisper","hum","static","reverberation","glow","flicker",
-"shadow","glare","blur","haze","fog","scent","fragrance","stench",
-"warmth","chill","pressure","weight","lightness","roughness","smoothness",
+  // Sensory / Atmospheric
+  "silence","whisper","hum","static","reverberation","glow","flicker",
+  "shadow","glare","blur","haze","fog","scent","fragrance","stench",
+  "warmth","chill","pressure","weight","lightness","roughness","smoothness",
 
-// Weird
-"ghost","trace","scar","imprint","residue","fragment","shard","relic",
-"echo","mirror","reflection","veil","mask","pulse","rift",
-"thread","knot","tangle","web","loop","spiral","axis","center","edge",
-
-
+  // Weird
+  "ghost","trace","scar","imprint","residue","fragment","shard","relic",
+  "echo","mirror","reflection","veil","mask","pulse","rift",
+  "thread","knot","tangle","web","loop","spiral","axis","center","edge",
 ];
-
 
 // --------------------
 // DOM
@@ -110,6 +106,94 @@ let targetVec = null;
 let progress = { puzzleId: null, guesses: [] };
 
 const STORAGE_KEY = "semantic-orbit-progress";
+
+
+let streak = null;
+
+
+const STREAK_KEY = "semantic-orbit-streak-v1";
+
+function londonDayId(d = new Date()) {
+ 
+  const fmt = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/London",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+  return fmt.format(d);
+}
+
+function loadStreak() {
+  try {
+    return JSON.parse(localStorage.getItem(STREAK_KEY) || "null") || {
+      currentStreak: 0,
+      bestStreak: 0,
+      lastWinDayId: null,   // "YYYY-MM-DD"
+      lastSeenDayId: null,  // "YYYY-MM-DD"
+      wins: 0,
+    };
+  } catch {
+    return {
+      currentStreak: 0,
+      bestStreak: 0,
+      lastWinDayId: null,
+      lastSeenDayId: null,
+      wins: 0,
+    };
+  }
+}
+
+function saveStreak(s) {
+  localStorage.setItem(STREAK_KEY, JSON.stringify(s));
+}
+
+
+function onGameOpenToday() {
+  const s = loadStreak();
+  const today = londonDayId();
+
+  if (s.lastSeenDayId && s.lastSeenDayId !== today) {
+    const y = new Date();
+    y.setDate(y.getDate() - 1);
+    const yesterday = londonDayId(y);
+
+    
+    if (s.lastWinDayId !== yesterday) {
+      s.currentStreak = 0;
+    }
+  }
+
+  s.lastSeenDayId = today;
+  saveStreak(s);
+  return s;
+}
+
+
+function onWinToday() {
+  const s = loadStreak();
+  const today = londonDayId();
+
+ 
+  if (s.lastWinDayId === today) return s;
+
+  const y = new Date();
+  y.setDate(y.getDate() - 1);
+  const yesterday = londonDayId(y);
+
+  if (s.lastWinDayId === yesterday) {
+    s.currentStreak += 1;
+  } else {
+    s.currentStreak = 1;
+  }
+
+  s.bestStreak = Math.max(s.bestStreak, s.currentStreak);
+  s.lastWinDayId = today;
+  s.wins += 1;
+
+  saveStreak(s);
+  return s;
+}
 
 // --------------------
 // Helpers
@@ -147,12 +231,10 @@ function similarityToRadius(sim) {
   if (sim < MIN_SIM) return OUTER_R;
 
   const t = clamp((sim - MIN_SIM) / (WIN_SIM - MIN_SIM), 0, 1);
-
   const eased = 1 - Math.pow(t, 1.8);
 
   return CORE_R + eased * (OUTER_R - CORE_R);
 }
-
 
 function motionKind(sim) {
   if (sim >= 0.70) return "tight";
@@ -161,7 +243,6 @@ function motionKind(sim) {
   if (sim >= 0.25) return "wobble";
   return "pushed";
 }
-
 
 // stable-ish hash for daily seed
 function hash32(str) {
@@ -174,7 +255,8 @@ function hash32(str) {
 }
 
 function pickDailyTarget() {
-  const iso = new Date().toISOString().slice(0, 10); // UTC day
+
+  const iso = londonDayId(); // "YYYY-MM-DD" in Europe/London
   const seed = hash32(iso);
   const idx = seed % TARGETS.length;
   PUZZLE_ID = `${iso}-${seed}`;
@@ -299,10 +381,11 @@ function update(dt) {
   if (solved && collapseT < 1) collapseT = Math.min(1, collapseT + 0.02 * dt);
 
   for (const n of nodes) {
-      const t = (performance.now() - n.born) * 0.001;
+    const t = (performance.now() - n.born) * 0.001;
     const orbitAngle = n.baseAngle + n.orbitSpeed * t;
     n.tx = n.radius * Math.cos(orbitAngle);
-    n.ty = n.radius * Math.sin(orbitAngle);  
+    n.ty = n.radius * Math.sin(orbitAngle);
+
     const {spring, damp, jitter} = motionParams(n.motion);
     const ax = (n.tx - n.x) * spring;
     const ay = (n.ty - n.y) * spring;
@@ -317,7 +400,7 @@ function update(dt) {
     n.y += n.vy * dt;
 
     if (solved) {
-       n.radius *= (1 - 0.02 * collapseT);
+      n.radius *= (1 - 0.02 * collapseT);
     }
   }
 }
@@ -372,19 +455,27 @@ loop();
 // Embeddings
 // --------------------
 async function embed(text) {
-  // returns a 384-d embedding vector (array of floats)
+  
   const out = await embedder(text, { pooling: "mean", normalize: true });
-  // out.data is a Float32Array
+
   return Array.from(out.data);
 }
 
 async function init() {
   addLog("Loading model (first time may take a bit)...", "");
   embedder = await pipeline("feature-extraction", MODEL_ID);
+
   pickDailyTarget();
+
+  
+  streak = onGameOpenToday();
+  addLog(`Streak: ${streak.currentStreak} (best ${streak.bestStreak})`, "");
+
   targetVec = await embed(targetWord);
+
   progress = loadProgress();
   updateGuessCount();
+
   if (progress.guesses.length > 0) {
     addLog(`Restoring ${progress.guesses.length} guess${progress.guesses.length === 1 ? "" : "es"}...`, "");
     for (const word of progress.guesses) {
@@ -393,7 +484,6 @@ async function init() {
   }
   addLog("Ready.", "");
 }
-
 
 async function applyGuess(word, restoring = false) {
   const v = await embed(word);
@@ -412,6 +502,11 @@ async function applyGuess(word, restoring = false) {
 
   if (win) {
     solved = true;
+
+    
+    streak = onWinToday();
+    addLog(`Streak is now ${streak.currentStreak} (best ${streak.bestStreak})`, "solved");
+
     addLog("You entered the core.", "solved");
   }
 
@@ -431,13 +526,12 @@ input.addEventListener("keydown", async (e) => {
   if (!word) return;
   input.value = "";
 
-if (progress.guesses.includes(word)) {
+  if (progress.guesses.includes(word)) {
     addLog("already guessed", "");
     return;
   }
 
   await applyGuess(word, false);
-
 });
 
 resetGuessesBtn.addEventListener("click", () => {
