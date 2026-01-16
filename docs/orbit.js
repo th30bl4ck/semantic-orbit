@@ -151,13 +151,14 @@ function similarityToRadius(sim) {
   return CORE_R + eased * (OUTER_R - CORE_R);
 }
 
-function motionKind(sim) {
-  if (sim >= 0.32) return "tight";
-  if (sim >= 0.27) return "pulled";
-  if (sim >= 0.20) return "drift";
-  if (sim >= 0.10) return "wobble";
+function motionKindFromRadius(r) {
+  if (r <= CORE_R + 12) return "tight";
+  if (r <= 140) return "pulled";
+  if (r <= 220) return "drift";
+  if (r <= 300) return "wobble";
   return "pushed";
 }
+
 
 // stable-ish hash for daily seed
 function hash32(str) {
