@@ -147,7 +147,7 @@ function similarityToRadius(sim) {
   if (sim < MIN_SIM) return OUTER_R;
 
   const t = clamp((sim - MIN_SIM) / (1 - MIN_SIM), 0, 1);
-  const eased = 1 - Math.pow(t, 1.8);
+  const eased = 1 - Math.pow(t, 0.6);
   return CORE_R + eased * (OUTER_R - CORE_R);
 }
 
