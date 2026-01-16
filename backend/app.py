@@ -18,7 +18,7 @@ from sentence_transformers import SentenceTransformer
 # Config
 # -------------------------
 MODEL_NAME = os.getenv("ORBIT_MODEL", "all-MiniLM-L6-v2")
-WIN_SIMILARITY = float(os.getenv("ORBIT_WIN_SIM", "0.90"))  # tune 0.75–0.82
+WIN_SIMILARITY = float(os.getenv("ORBIT_WIN_SIM", "0.79"))  # tune 0.75–0.82
 MIN_SIM_FOR_VISIBLE = float(os.getenv("ORBIT_MIN_SIM", "0.05"))
 
 # canvas "world" units (frontend draws these as pixels)
