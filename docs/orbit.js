@@ -416,6 +416,11 @@ input.addEventListener("keydown", async (e) => {
   if (!word) return;
   input.value = "";
 
+if (progress.guesses.includes(word)) {
+    addLog("already guessed", "");
+    return;
+  }
+
   await applyGuess(word, false);
 
 });
