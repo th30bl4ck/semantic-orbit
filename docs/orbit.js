@@ -151,7 +151,7 @@ function similarityToRadius(sim) {
   return CORE_R + eased * (OUTER_R - CORE_R);
 }
 
-function motionKindFromRadius(r) {
+function motionKind(sim) {
   if (r <= CORE_R + 12) return "tight";
   if (r <= 140) return "pulled";
   if (r <= 220) return "drift";
