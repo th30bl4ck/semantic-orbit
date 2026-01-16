@@ -1,10 +1,10 @@
 <!doctype html>
 <html>
 <head>
-  <script type="module" src="./orbit.js"></script>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Semantic Orbit</title>
+
   <style>
     body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; background:#0b0c10; color:#e8e8e8; }
     .wrap { max-width: 900px; margin: 0 auto; padding: 16px; }
@@ -25,6 +25,7 @@
     .solved { font-weight:700; }
   </style>
 </head>
+
 <body>
   <div class="wrap">
     <div class="top">
@@ -35,14 +36,36 @@
       <div class="pill" id="puzzleId">loading…</div>
     </div>
 
-    <div class="card" style="margin-top:12px;">
+    <!-- CANVAS CARD: now position:relative, and reset button moved here -->
+    <div class="card" style="margin-top:12px; position: relative;">
       <canvas id="c" width="900" height="820"></canvas>
+
+      <button
+        id="resetGuesses"
+        type="button"
+        style="
+          position: absolute;
+          top: 14px;
+          right: 14px;
+          z-index: 5;
+          padding: 8px 14px;
+          border-radius: 12px;
+          background: rgba(0,0,0,0.45);
+          color: #fff;
+          border: 1px solid rgba(255,255,255,0.18);
+          cursor: pointer;
+          backdrop-filter: blur(6px);
+        "
+        onmouseover="this.style.background='rgba(255,255,255,0.18)'"
+        onmouseout="this.style.background='rgba(0,0,0,0.45)'"
+      >
+        Reset guesses
+      </button>
     </div>
 
     <div class="card" style="margin-top:12px;">
       <div class="row guess-row">
         <input id="guess" placeholder="Type a word and press Enter…" autocomplete="off" />
-      <button id="resetGuesses" type="button">Reset guesses</button>
         <div class="pill guess-count" id="guessCount">Guesses: 0</div>
       </div>
       <div class="hint" style="margin-top:8px;">
@@ -56,7 +79,7 @@
     </div>
   </div>
 
-<script type="module" src="./orbit.js"></script>
-
+  <script type="module" src="./orbit.js"></script>
 </body>
 </html>
+
