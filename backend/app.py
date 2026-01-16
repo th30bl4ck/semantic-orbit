@@ -118,19 +118,16 @@ def embedding_to_angle(vec: np.ndarray, proj2d: np.ndarray) -> float:
 
 
 def orbit_motion_kind(sim: float) -> str:
-    """
-    Labels for frontend animation styles.
-    No numbers, just vibe.
-    """
-    if sim >= 0.86:
-        return "tight"
     if sim >= 0.78:
+        return "tight"
+    if sim >= 0.68:
         return "pulled"
-    if sim >= 0.62:
+    if sim >= 0.55:
         return "drift"
-    if sim >= 0.40:
+    if sim >= 0.35:
         return "wobble"
     return "pushed"
+
 
 
 # -------------------------
