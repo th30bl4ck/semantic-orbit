@@ -13,6 +13,9 @@
     canvas { width:100%; height:auto; border-radius: 18px; border: 1px solid rgba(255,255,255,0.10); background: radial-gradient(circle at center, rgba(150,150,255,0.10), rgba(0,0,0,0) 55%); }
     input { width: 100%; padding: 12px 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.20); background: rgba(0,0,0,0.3); color: #fff; font-size: 16px; }
     .row { display:flex; gap:12px; align-items:center; }
+    .guess-row { justify-content: space-between; }
+    .guess-row input { flex: 1; }
+    .guess-count { margin-left: 12px; white-space: nowrap; }
     .hint { opacity:0.8; font-size: 13px; line-height:1.4; }
     .pill { opacity:0.8; font-size:12px; padding:6px 10px; border-radius:999px; border:1px solid rgba(255,255,255,0.15); }
     .log { max-height: 180px; overflow:auto; }
@@ -35,8 +38,9 @@
     </div>
 
     <div class="card" style="margin-top:12px;">
-      <div class="row">
+      <div class="row guess-row">
         <input id="guess" placeholder="Type a word and press Enter…" autocomplete="off" />
+      <div class="pill guess-count" id="guessCount">Guesses: 0</div>
       </div>
       <div class="hint" style="margin-top:8px;">
         Motion meanings: pulled inward = closer • sideways drift = related • pushed outward = far • tight orbit = very close
