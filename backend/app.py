@@ -124,7 +124,7 @@ def orbit_motion_kind(sim: float) -> str:
         return "pulled"
     if sim >= 0.20:
         return "drift"
-    if sim >= 0.10:
+    if sim >= 0.15:
         return "wobble"
     return "pushed"
 
