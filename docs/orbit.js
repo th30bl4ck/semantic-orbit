@@ -158,7 +158,7 @@ function motionKind(sim) {
   if (sim >= 0.40) return "tight";
   if (sim >= 0.27) return "pulled";
   if (sim >= 0.20) return "drift";
-  if (sim >= 0.10) return "wobble";
+  if (sim >= 0.15) return "wobble";
   return "pushed";
 }
 
