@@ -50,6 +50,7 @@ const ctx = canvas.getContext("2d");
 const input = document.getElementById("guess");
 const logEl = document.getElementById("log");
 const puzzleEl = document.getElementById("puzzleId");
+const guessCountEl = document.getElementById("guessCount");
 
 const WORLD = { w: canvas.width, h: canvas.height };
 const CENTER = { x: WORLD.w / 2, y: WORLD.h / 2 };
@@ -77,6 +78,10 @@ function addLog(text, cls="") {
   d.textContent = text;
   if (cls) d.className = cls;
   logEl.prepend(d);
+}
+
+function updateGuessCount() {
+  guessCountEl.textContent = `Guesses: ${progress.guesses.length}`;
 }
 
 function norm(v) {
@@ -324,6 +329,7 @@ async function init() {
   pickDailyTarget();
   targetVec = await embed(targetWord);
   progress = loadProgress();
+  updateGuessCount();
   if (progress.guesses.length > 0) {
     addLog(`Restoring ${progress.guesses.length} guess${progress.guesses.length === 1 ? "" : "es"}...`, "");
     for (const word of progress.guesses) {
@@ -357,6 +363,7 @@ async function applyGuess(word, restoring = false) {
   if (!restoring) {
     progress.guesses.push(word);
     saveProgress();
+    updateGuessCount();
   }
 }
 
