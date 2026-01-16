@@ -64,7 +64,7 @@ const TARGETS = [
 
 // Time / Process
 "moment","instant","duration","interval","sequence","cycle","loop",
-"phase","epoch","era","aftermath","prelude","echo","aftermath",
+"phase","epoch","era","aftermath","prelude","aftermath",
 "beginning","ending","delay","pause","acceleration","decay",
 "growth","erosion","drift","accumulation","release",
 
@@ -75,7 +75,7 @@ const TARGETS = [
 
 // Weird
 "ghost","trace","scar","imprint","residue","fragment","shard","relic",
-"signal","echo","mirror","reflection","veil","mask","pulse","rift",
+"echo","mirror","reflection","veil","mask","pulse","rift",
 "thread","knot","tangle","web","loop","spiral","axis","center","edge",
 
 
