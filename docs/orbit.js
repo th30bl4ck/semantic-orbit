@@ -648,9 +648,9 @@ async function initPrivateDebugger(getAnswerFn) {
   const ok = await ensureDebugUnlocked();
   if (!ok) return;
 
-  // Keybind: Ctrl+Shift+D
+  // Keybind: Ctrl+Shift+E
   window.addEventListener("keydown", (e) => {
-    if (e.ctrlKey && e.shiftKey && (e.key === "D" || e.key === "d")) {
+    if (e.ctrlKey && e.shiftKey && (e.key === "E" || e.key === "e")) {
       const ans = getAnswerFn();
       setOverlayText(`ANSWER: ${ans}`);
       toggleOverlay();
