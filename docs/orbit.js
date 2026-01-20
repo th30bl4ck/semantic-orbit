@@ -278,9 +278,6 @@ function showYesterdayWord() {
   if (el) el.textContent = y.word;
 }
 
-
-function pickDailyTarget() {
-
 function pickDailyTarget() {
   const today = pickTargetForDayId(londonDayId()); // "YYYY-MM-DD" London
   PUZZLE_ID = today.puzzleId;
