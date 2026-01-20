@@ -351,7 +351,7 @@ function drawRings() {
   for (let r of [CORE_R, 140, 220, 300, OUTER_R]) {
     ctx.beginPath();
     ctx.arc(0,0,r,0,Math.PI*2);
-    ctx.strokeStyle = "rgba(255,255,255,0.08)";
+    ctx.strokeStyle = "rgba(255,255,255,0.16)";
     ctx.lineWidth = (r === CORE_R) ? 2 : 1;
     ctx.stroke();
   }
@@ -361,13 +361,13 @@ function drawRings() {
   ctx.lineTo(OUTER_R, 0);
   ctx.moveTo(0, -OUTER_R);
   ctx.lineTo(0, OUTER_R);
-  ctx.strokeStyle = "rgba(255,255,255,0.04)";
+  ctx.strokeStyle = "rgba(255,255,255,0.08)";
   ctx.stroke();
 
   const extra = solved ? (18 * collapseT) : 0;
   ctx.beginPath();
   ctx.arc(0,0, (CORE_R-6) + extra, 0, Math.PI*2);
-  ctx.fillStyle = solved ? "rgba(210,210,255,0.18)" : "rgba(170,170,255,0.10)";
+  ctx.fillStyle = solved ? "rgba(210,210,255,0.18)" : "rgba(170,170,255,0.22)";
   ctx.fill();
 
   ctx.restore();
