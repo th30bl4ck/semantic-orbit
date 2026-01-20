@@ -254,14 +254,38 @@ function hash32(str) {
   return h >>> 0;
 }
 
+function londonYesterdayDayId() {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  return londonDayId(d);
+}
+
+function pickTargetForDayId(dayId) {
+  const seed = hash32(dayId);
+  const idx = seed % TARGETS.length;
+  return {
+    dayId,
+    seed,
+    idx,
+    word: TARGETS[idx],
+    puzzleId: `${dayId}-${seed}`,
+  };
+}
+
+function showYesterdayWord() {
+  const y = pickTargetForDayId(londonYesterdayDayId());
+  const el = document.getElementById("yWord");
+  if (el) el.textContent = y.word;
+}
+
+
 function pickDailyTarget() {
 
-  const iso = londonDayId(); // "YYYY-MM-DD" in Europe/London
-  const seed = hash32(iso);
-  const idx = seed % TARGETS.length;
-  PUZZLE_ID = `${iso}-${seed}`;
+function pickDailyTarget() {
+  const today = pickTargetForDayId(londonDayId()); // "YYYY-MM-DD" London
+  PUZZLE_ID = today.puzzleId;
   puzzleEl.textContent = PUZZLE_ID;
-  targetWord = TARGETS[idx];
+  targetWord = today.word;
 }
 
 function loadProgress() {
@@ -466,7 +490,7 @@ async function init() {
   embedder = await pipeline("feature-extraction", MODEL_ID);
 
   pickDailyTarget();
-
+  showYesterdayWord();
   
   streak = onGameOpenToday();
   addLog(`Streak: ${streak.currentStreak} (best ${streak.bestStreak})`, "");
