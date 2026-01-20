@@ -10,6 +10,10 @@ const MIN_SIM = 0.05;
 const CORE_R = 60;
 const OUTER_R = 390;
 
+let won = false;
+let winSeed = null;
+
+
 // Daily target list
 const TARGETS = [
   // physical / natural
