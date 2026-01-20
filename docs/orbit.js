@@ -231,10 +231,14 @@ function similarityToRadius(sim) {
   sim = clamp(sim, -1, 1);
   if (sim < MIN_SIM) return OUTER_R;
 
-  const t = clamp((sim - MIN_SIM) / (WIN_SIM - MIN_SIM), 0, 1);
-  const eased = 1 - Math.pow(t, 1.8);
-
-  return CORE_R + eased * (OUTER_R - CORE_R);
+    switch (motionKind(sim)) {
+    case "tight":  return CORE_R;  // closest ring
+    case "pulled": return 140;
+    case "drift":  return 220;
+    case "wobble": return 300;
+    case "pushed": return OUTER_R; // outer ring
+    default:       return OUTER_R;
+  }
 }
 
 function motionKind(sim) {
