@@ -242,10 +242,10 @@ function similarityToRadius(sim) {
 }
 
 function motionKind(sim) {
-  if (sim >= 0.50) return "tight";
-  if (sim >= 0.35) return "pulled";
-  if (sim >= 0.25) return "drift";
-  if (sim >= 0.15) return "wobble";
+  if (sim >= 0.60) return "tight";
+  if (sim >= 0.45) return "pulled";
+  if (sim >= 0.35) return "drift";
+  if (sim >= 0.25) return "wobble";
   return "pushed";
 }
 
