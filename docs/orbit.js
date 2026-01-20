@@ -3,8 +3,8 @@ import { pipeline } from "https://cdn.jsdelivr.net/npm/@xenova/transformers/dist
 // --------------------
 // Config
 // --------------------
-const MODEL_ID = "Xenova/all-MiniLM-L6-v2"; // good quality, runs in browser
-const WIN_SIM = 0.78;
+const MODEL_ID = "Xenova/all-MiniLM-L6-v2"; 
+const WIN_SIM = 0.90;
 const MIN_SIM = 0.05;
 
 const CORE_R = 60;
