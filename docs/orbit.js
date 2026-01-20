@@ -79,6 +79,169 @@ const TARGETS = [
 ];
 initPrivateDebugger(() => target);
 
+
+// --------------------
+// Run signature 
+// --------------------
+
+
+function fnv1a32(str) {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    
+    h = (h + ((h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24))) >>> 0;
+  }
+  return h >>> 0;
+}
+
+
+function mulberry32(seed) {
+  let a = seed >>> 0;
+  return function rand() {
+    a = (a + 0x6D2B79F5) >>> 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t ^= t + Math.imul(t ^ (t >>> 7), 61 | t);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+
+function seedFromRun(targetWord, guesses) {
+  
+  const parts = guesses.map(g => {
+    const w = (g.word || "").toLowerCase().trim();
+    const s = (g.sim ?? 0);
+    const r = (g.r ?? 0);
+    return `${w}:${s.toFixed(4)}:${Math.round(r)}`;
+  });
+
+  const signature = `target=${(targetWord || "").toLowerCase()}|` + parts.join("|");
+  return fnv1a32(signature);
+}
+
+// --------------------
+// Generative core art
+// --------------------
+function hsl(h, s, l, a = 1) {
+  return `hsla(${h}, ${s}%, ${l}%, ${a})`;
+}
+
+function drawCoreArt(ctx, cx, cy, coreR, seed) {
+  const rand = mulberry32(seed);
+
+  ctx.save();
+  // Clip to the core circle so art stays inside
+  ctx.beginPath();
+  ctx.arc(cx, cy, coreR, 0, Math.PI * 2);
+  ctx.clip();
+
+  // Background wash (soft blobs)
+  ctx.globalCompositeOperation = "source-over";
+  ctx.clearRect(cx - coreR, cy - coreR, coreR * 2, coreR * 2);
+
+  const baseHue = Math.floor(rand() * 360);
+  const blobCount = 10 + Math.floor(rand() * 14);
+
+  for (let i = 0; i < blobCount; i++) {
+    const hue = (baseHue + Math.floor(rand() * 140) - 70 + 360) % 360;
+    const radius = coreR * (0.25 + rand() * 0.9);
+    const x = cx + (rand() * 2 - 1) * coreR;
+    const y = cy + (rand() * 2 - 1) * coreR;
+
+    const grad = ctx.createRadialGradient(x, y, 0, x, y, radius);
+    grad.addColorStop(0, hsl(hue, 85, 60, 0.55));
+    grad.addColorStop(1, hsl(hue, 85, 20, 0.0));
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Add rings / arcs for “orbit vibe”
+  ctx.globalCompositeOperation = "screen";
+  const ringCount = 6 + Math.floor(rand() * 10);
+  for (let i = 0; i < ringCount; i++) {
+    const hue = (baseHue + Math.floor(rand() * 220)) % 360;
+    const r = coreR * (0.15 + rand() * 0.95);
+    const lw = 1 + rand() * 4;
+    const start = rand() * Math.PI * 2;
+    const end = start + (0.3 + rand() * 1.9) * Math.PI;
+
+    ctx.strokeStyle = hsl(hue, 90, 65, 0.35 + rand() * 0.35);
+    ctx.lineWidth = lw;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, start, end);
+    ctx.stroke();
+  }
+
+  // Sprinkle shapes: dots, triangles, little “comets”
+  ctx.globalCompositeOperation = "lighter";
+  const shapeCount = 30 + Math.floor(rand() * 60);
+
+  for (let i = 0; i < shapeCount; i++) {
+    const hue = (baseHue + Math.floor(rand() * 180) - 90 + 360) % 360;
+    const x = cx + (rand() * 2 - 1) * coreR;
+    const y = cy + (rand() * 2 - 1) * coreR;
+
+    const t = rand();
+    if (t < 0.55) {
+      // dot
+      const r = 0.8 + rand() * 3.5;
+      ctx.fillStyle = hsl(hue, 90, 70, 0.25 + rand() * 0.5);
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (t < 0.80) {
+      // triangle
+      const size = 3 + rand() * 10;
+      const ang = rand() * Math.PI * 2;
+      ctx.fillStyle = hsl(hue, 95, 65, 0.18 + rand() * 0.35);
+      ctx.beginPath();
+      for (let k = 0; k < 3; k++) {
+        const a = ang + k * (Math.PI * 2 / 3);
+        const px = x + Math.cos(a) * size;
+        const py = y + Math.sin(a) * size;
+        if (k === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.closePath();
+      ctx.fill();
+    } else {
+      // comet streak
+      const len = 8 + rand() * 30;
+      const ang = rand() * Math.PI * 2;
+      const x2 = x + Math.cos(ang) * len;
+      const y2 = y + Math.sin(ang) * len;
+
+      ctx.strokeStyle = hsl(hue, 95, 70, 0.12 + rand() * 0.25);
+      ctx.lineWidth = 1 + rand() * 2.5;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+    }
+  }
+
+  ctx.restore();
+
+  // Optional: a subtle border ring to make it pop
+  ctx.save();
+  ctx.globalCompositeOperation = "source-over";
+  ctx.strokeStyle = "rgba(255,255,255,0.12)";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(cx, cy, coreR - 1, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
+}
+
+if (won) {
+  const seed = seedFromRun(targetWord, guesses);
+  drawCoreArt(ctx, centerX, centerY, CORE_R, seed);
+}
+
+
 // --------------------
 // DOM
 // --------------------
