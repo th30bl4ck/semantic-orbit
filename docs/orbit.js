@@ -81,7 +81,6 @@ const TARGETS = [
   "echo","mirror","reflection","veil","mask","pulse","rift",
   "thread","knot","tangle","web","loop","spiral","axis","center","edge",
 ];
-initPrivateDebugger(() => target);
 
 
 // --------------------
@@ -735,95 +734,5 @@ resetGuessesBtn.addEventListener("click", () => {
   if (!embedder) return;
   resetGuesses();
 });
-
-const DEBUG_QUERY_FLAG = "debug";
-const DEBUG_STORAGE_KEY = "so_debug_ok_v1";
-
-const DEBUG_PASSWORD = "Blacktheo66@";
-
-async function sha256Hex(str) {
-  const enc = new TextEncoder().encode(str);
-  const buf = await crypto.subtle.digest("SHA-256", enc);
-  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
-}
-
-function hasDebugFlag() {
-  const url = new URL(location.href);
-  return url.searchParams.get(DEBUG_QUERY_FLAG) === "1";
-}
-
-function makeOverlay() {
-  let el = document.getElementById("so-debug-overlay");
-  if (el) return el;
-
-  el = document.createElement("div");
-  el.id = "so-debug-overlay";
-  el.style.position = "fixed";
-  el.style.left = "12px";
-  el.style.bottom = "12px";
-  el.style.zIndex = "999999";
-  el.style.padding = "10px 12px";
-  el.style.borderRadius = "12px";
-  el.style.background = "rgba(0,0,0,0.75)";
-  el.style.border = "1px solid rgba(255,255,255,0.18)";
-  el.style.fontFamily = "system-ui, -apple-system, Segoe UI, Roboto, Arial";
-  el.style.fontSize = "14px";
-  el.style.color = "#fff";
-  el.style.backdropFilter = "blur(6px)";
-  el.style.display = "none";
-  el.style.maxWidth = "calc(100vw - 24px)";
-  el.style.pointerEvents = "none";
-
-  document.body.appendChild(el);
-  return el;
-}
-
-function setOverlayText(text) {
-  const el = makeOverlay();
-  el.textContent = text;
-}
-
-function toggleOverlay() {
-  const el = makeOverlay();
-  el.style.display = (el.style.display === "none") ? "block" : "none";
-}
-
-async function ensureDebugUnlocked() {
-  if (!hasDebugFlag()) return false;
-
-  const stored = localStorage.getItem(DEBUG_STORAGE_KEY);
-  if (stored === "1") return true;
-
-  const correctHash = await sha256Hex(DEBUG_PASSWORD);
-  const attempt = prompt("Debug mode: enter password");
-  if (attempt == null) return false;
-
-  const attemptHash = await sha256Hex(attempt);
-  if (attemptHash === correctHash) {
-    localStorage.setItem(DEBUG_STORAGE_KEY, "1");
-    alert("Debug unlocked. Press Ctrl+Shift+D to toggle answer.");
-    return true;
-  } else {
-    alert("Wrong password.");
-    return false;
-  }
-}
-
-async function initPrivateDebugger(getAnswerFn) {
-  if (!hasDebugFlag()) return; // invisible for normal users
-
-  const ok = await ensureDebugUnlocked();
-  if (!ok) return;
-
-  // Keybind: Ctrl+Shift+E
-  window.addEventListener("keydown", (e) => {
-    if (e.ctrlKey && e.shiftKey && (e.key === "E" || e.key === "e")) {
-      const ans = getAnswerFn();
-      setOverlayText(`ANSWER: ${ans}`);
-      toggleOverlay();
-    }
-  });
-}
-
 
 init();
