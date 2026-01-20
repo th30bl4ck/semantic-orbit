@@ -458,6 +458,8 @@ function pickDailyTarget() {
   PUZZLE_ID = today.puzzleId;
   puzzleEl.textContent = PUZZLE_ID;
   targetWord = today.word;
+
+  window.__SO_DEBUG_TARGET = targetWord;
 }
 
 function loadProgress() {
