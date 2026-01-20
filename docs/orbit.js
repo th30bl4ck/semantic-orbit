@@ -227,17 +227,21 @@ function clamp(x, lo, hi) {
   return Math.max(lo, Math.min(hi, x));
 }
 
+function rand(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
 function similarityToRadius(sim) {
   sim = clamp(sim, -1, 1);
   if (sim < MIN_SIM) return OUTER_R;
 
     switch (motionKind(sim)) {
-    case "tight":  return 90;  // closest ring
-    case "pulled": return 140;
-    case "drift":  return 220;
-    case "wobble": return 300;
-    case "pushed": return OUTER_R; // outer ring
-    default:       return OUTER_R;
+  case "tight":   return rand(70, 90);     // closest ring
+  case "pulled":  return rand(100, 160);
+  case "drift":   return rand(180, 240);
+  case "wobble":  return rand(260, 320);
+  case "pushed":  return rand(360, 390);   // outer ring
+  default:        return rand(360, 390);
   }
 }
 
