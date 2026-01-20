@@ -232,7 +232,7 @@ function similarityToRadius(sim) {
   if (sim < MIN_SIM) return OUTER_R;
 
     switch (motionKind(sim)) {
-    case "tight":  return CORE_R;  // closest ring
+    case "tight":  return 90;  // closest ring
     case "pulled": return 140;
     case "drift":  return 220;
     case "wobble": return 300;
