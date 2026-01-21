@@ -14,72 +14,110 @@ let won = false;
 let winSeed = null;
 
 
-// Daily target list
 const TARGETS = [
-  // physical / natural
-  "meteor","comet","asteroid","nebula","cosmos","vacuum","plasma","quasar",
-  "monsoon","avalanche","earthquake","aftershock","fissure","rift","canyon",
-  "delta","estuary","lagoon","reef","abyss","trench","geyser","thermal",
-  "frost","hail","dew","drought","blight","canopy","understory","root",
-  "ember","ash","smoke","soot","flare","spark","wildfire","char",
 
-  // places / structures
+  // ─── Physical / Natural ─────────────────────────────
+  "meteor","comet","asteroid","nebula","supernova","pulsar","quasar","vacuum",
+  "plasma","gravity","radiation","orbit","eclipse","flare","fusion","collapse",
+  "monsoon","cyclone","avalanche","landslide","earthquake","tremor","fissure",
+  "canyon","gorge","plateau","delta","estuary","lagoon","reef","abyss",
+  "trench","geyser","thermal","frost","hail","dew","drought","blight","canopy",
+  "understory","root","ember","ash","smoke","soot","spark","wildfire","char",
+  "erosion","sediment","mineral","current","tide","horizon","atmosphere",
+  "pressure","turbulence","updraft","fallout","resonance",
+
+  // ─── Built / Places / Structures ────────────────────
   "bastion","citadel","fortress","outpost","encampment","tower","spire",
   "basement","attic","cellar","vault","archive","repository","chamber",
-  "gallery","hallway","alcove","atrium","courtyard","plaza","market",
+  "gallery","corridor","alcove","atrium","courtyard","plaza","market",
   "border","frontier","checkpoint","terminal","platform","station",
   "monument","shrine","crypt","mausoleum","graveyard","lighthouse",
+  "observatory","sanctuary","barracks","depot","armory","warehouse",
+  "workshop","studio","library","conservatory","greenhouse","silo",
+  "aqueduct","viaduct","bridge","passage","threshold","enclosure",
 
-  // emotions / inner states
+  // ─── Emotional / Psychological ──────────────────────
   "yearning","regret","envy","guilt","shame","pride","relief","panic",
   "contentment","serenity","unease","restlessness","apathy","resentment",
   "affection","devotion","adoration","tenderness","bitterness","jealousy",
   "despair","emptiness","fulfillment","loneliness","belonging","alienation",
   "gratitude","compassion","empathy","detachment","vulnerability",
+  "anticipation","dread","melancholy","nostalgia","wonder","awe",
+  "frustration","irritation","exhaustion","calm","resolve",
+  "acceptance","denial","fixation","doubt","reassurance",
 
-  // abstract concepts
+  // ─── Abstract Concepts ──────────────────────────────
   "duality","paradox","infinity","finitude","continuity","discontinuity",
   "causality","randomness","probability","certainty","ambiguity","clarity",
-  "origin","destination","transition","boundary","threshold","liminality",
-  "symmetry","asymmetry","equilibrium","instability","emergence","collapse",
+  "origin","destination","transition","boundary","liminality",
+  "symmetry","asymmetry","equilibrium","instability","emergence",
   "truth","illusion","appearance","essence","potential","actuality",
+  "identity","meaning","absence","presence","coherence","contradiction",
+  "structure","chaos","order","pattern","anomaly","context","perspective",
+  "intention","consequence","interpretation","abstraction",
 
-  // human / social
+  // ─── Human / Social ─────────────────────────────────
   "alliance","betrayal","loyalty","authority","rebellion","obedience",
-  "tradition","heritage","custom","taboo","identity","reputation",
-  "status","hierarchy","community","isolation","solidarity","division",
+  "heritage","custom","taboo","reputation","status",
+  "hierarchy","community","isolation","solidarity","division",
   "cooperation","competition","negotiation","compromise","sacrifice",
   "legacy","inheritance","mentorship","leadership","followership",
+  "conformity","dissent","influence","persuasion","manipulation",
+  "trust","suspicion","accountability","obligation","consensus",
+  "polarization","affiliation","exclusion",
 
-  // creative / intellectual
-  "composition","structure","form","contrast","tone","texture","palette",
-  "motif","theme","variation","iteration","draft","revision","edit",
-  "critique","interpretation","expression","abstraction","minimalism",
-  "maximalism","innovation","tradition","influence","canon","experiment",
-  "play","practice","discipline","mastery","craftsmanship",
+  // ─── Creative / Intellectual ────────────────────────
+  "composition","form","contrast","tone","texture","palette",
+  "motif","theme","variation","draft","revision","edit","critique",
+  "expression","minimalism","maximalism","innovation",
+  "canon","experiment","play","practice","discipline",
+  "mastery","craftsmanship","intuition","exploration","synthesis",
+  "distortion","emphasis","rhythm","balance","harmony",
 
-  // science / tech flavored
+  // ─── Science / Technology ───────────────────────────
   "algorithm","protocol","architecture","interface","latency","bandwidth",
   "signal","noise","entropy","compression","resolution","precision",
-  "approximation","iteration","optimization","convergence","divergence",
-  "variable","parameter","constraint","dataset","distribution","outlier",
-  "feedback","control","automation","simulation","modeling","prediction",
+  "approximation","optimization","convergence","divergence",
+  "variable","parameter","constraint","dataset","distribution",
+  "outlier","feedback","control","automation","simulation",
+  "modeling","prediction","calibration","inference","scalability",
+  "redundancy","robustness","failure",
 
-  // Time / Process
-  "moment","instant","duration","interval","sequence","cycle","loop",
-  "phase","epoch","era","aftermath","prelude","aftermath",
-  "beginning","ending","delay","pause","acceleration","decay",
-  "growth","erosion","drift","accumulation","release",
+  // ─── Time / Process / Change ────────────────────────
+  "moment","instant","duration","interval","sequence","cycle","phase",
+  "epoch","era","prelude","aftermath","beginning","ending","delay",
+  "pause","acceleration","decay","growth","drift","accumulation",
+  "release","progression","regression","repetition","disruption",
+  "stagnation","momentum","inertia","culmination",
+  "interruption","renewal","transformation",
 
-  // Sensory / Atmospheric
+  // ─── Sensory / Atmospheric ──────────────────────────
   "silence","whisper","hum","static","reverberation","glow","flicker",
-  "shadow","glare","blur","haze","fog","scent","fragrance","stench",
-  "warmth","chill","pressure","weight","lightness","roughness","smoothness",
+  "shadow","glare","blur","haze","fog","scent","fragrance","warmth",
+  "chill","weight","lightness","roughness","smoothness",
+  "vibration","echo","murmur","stillness","shimmer",
+  "dullness","sharpness","density","openness",
 
-  // Weird
-  "ghost","trace","scar","imprint","residue","fragment","shard","relic",
-  "echo","mirror","reflection","veil","mask","pulse","rift",
-  "thread","knot","tangle","web","loop","spiral","axis","center","edge",
+  // ─── Spatial / Relational ───────────────────────────
+  "center","edge","axis","alignment","offset","distance","proximity",
+  "overlap","separation","exposure","depth","surface",
+  "layer","margin","void","frame","crossing","approach",
+  "retreat","orientation","scale","position",
+
+  // ─── Existential / Philosophical ────────────────────
+  "mortality","impermanence","selfhood","agency",
+  "freewill","determinism","responsibility","awareness",
+  "consciousness","perception","subjectivity","objectivity",
+  "purpose","belief","faith","skepticism",
+  "absurdity","transcendence",
+
+  // ─── Weird / Liminal / Orbit-Core ───────────────────
+  "ghost","trace","scar","imprint","residue","fragment","shard",
+  "relic","mirror","reflection","veil","mask","thread","knot",
+  "tangle","web","spiral","fracture","afterimage",
+  "recursion","hollow","inversion","displacement",
+  "riddle","cipher","artifact"
+
 ];
 
 
