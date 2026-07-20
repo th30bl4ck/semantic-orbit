@@ -199,7 +199,7 @@ function drawCoreArt(ctx, cx, cy, coreR, seed) {
     ctx.fill();
   }
 
-  // Add rings / arcs for “orbit vibe”
+ 
   ctx.globalCompositeOperation = "screen";
   const ringCount = 6 + Math.floor(rand() * 10);
   for (let i = 0; i < ringCount; i++) {
@@ -266,7 +266,7 @@ function drawCoreArt(ctx, cx, cy, coreR, seed) {
 
   ctx.restore();
 
-  // Optional: a subtle border ring to make it pop
+
   ctx.save();
   ctx.globalCompositeOperation = "source-over";
   ctx.strokeStyle = "rgba(255,255,255,0.12)";
@@ -533,7 +533,7 @@ function resetGuesses() {
   addLog("Guesses cleared.", "");
 }
 
-// simple angle from embedding chunks (cheap projection)
+
 function embeddingToAngle(vec) {
   // split into 2 sums to get a stable direction
   let x = 0, y = 0;
